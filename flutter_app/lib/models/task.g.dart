@@ -9,7 +9,7 @@ part of 'task.dart';
 _$BlockedByInfoImpl _$$BlockedByInfoImplFromJson(Map<String, dynamic> json) =>
     _$BlockedByInfoImpl(
       id: (json['id'] as num).toInt(),
-      title: (json['title'] as String?) ?? '',
+      title: json['title'] as String,
       status: $enumDecode(_$TaskStatusEnumMap, json['status']),
     );
 
@@ -28,15 +28,15 @@ const _$TaskStatusEnumMap = {
 
 _$TaskImpl _$$TaskImplFromJson(Map<String, dynamic> json) => _$TaskImpl(
       id: (json['id'] as num).toInt(),
-      title: (json['title'] as String?) ?? '',
-      description: (json['description'] as String?) ?? '',
-      dueDate: DateTime.parse((json['due_date'] as String?) ?? DateTime.now().toIso8601String()),
+      title: json['title'] as String,
+      description: json['description'] as String? ?? '',
+      dueDate: DateTime.parse(json['dueDate'] as String),
       status: $enumDecodeNullable(_$TaskStatusEnumMap, json['status']) ??
           TaskStatus.todo,
-      blockedById: (json['blocked_by_id'] as num?)?.toInt(),
-      blockedBy: json['blocked_by'] == null
+      blockedById: (json['blockedById'] as num?)?.toInt(),
+      blockedBy: json['blockedBy'] == null
           ? null
-          : BlockedByInfo.fromJson(json['blocked_by'] as Map<String, dynamic>),
+          : BlockedByInfo.fromJson(json['blockedBy'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$TaskImplToJson(_$TaskImpl instance) =>
@@ -44,10 +44,10 @@ Map<String, dynamic> _$$TaskImplToJson(_$TaskImpl instance) =>
       'id': instance.id,
       'title': instance.title,
       'description': instance.description,
-      'due_date': instance.dueDate.toIso8601String(),
+      'dueDate': instance.dueDate.toIso8601String(),
       'status': _$TaskStatusEnumMap[instance.status]!,
-      'blocked_by_id': instance.blockedById,
-      'blocked_by': instance.blockedBy?.toJson(),
+      'blockedById': instance.blockedById,
+      'blockedBy': instance.blockedBy,
     };
 
 _$TaskDraftImpl _$$TaskDraftImplFromJson(Map<String, dynamic> json) =>
