@@ -178,3 +178,35 @@ Rather than a package, a custom `RichText` + `TextSpan` builder walks the string
 | GET | `/health` | Health check |
 
 ---
+## AI Usage Report
+
+### Tools used
+Claude (claude.ai) was used throughout this project.
+
+### Prompts that gave the most helpful code
+
+1. **"Generate a FastAPI router for CRUD on a Task model with SQLAlchemy. The create and update routes must use `await asyncio.sleep(2)` to simulate processing delay without blocking the event loop. Include proper error handling with 404s and a cascade-clear when deleting a parent task."**  
+   → Produced nearly final-form `routers/tasks.py` in one shot, including the cascade logic.
+
+2. **"Write a Flutter Riverpod AsyncNotifier that wraps an API service, supports search and status filter state in a separate StateNotifier, and exposes create/update/delete methods that each refetch from the server on success."**  
+   → Gave the skeleton of `task_providers.dart`. Manual fix needed: the `autoDispose` variant of `AsyncNotifier` has different syntax (`AutoDisposeAsyncNotifier`) — the AI used the wrong base class for the autocomplete notifier.
+
+3. **"Write a Flutter RichText widget that takes a `text` string and a `highlight` substring and renders all matches with a coloured background, case-insensitively."**  
+   → Produced `highlighted_text.dart` essentially verbatim.
+
+### Where AI hallucinated / gave bad code
+
+**Issue:** In the Riverpod provider, the AI initially generated:
+
+```dart
+// WRONG — AutoDisposeAsyncNotifier requires different syntax in Riverpod 2.x
+final autocompleteProvider = AsyncNotifierProvider.autoDispose<...>(...)
+```
+
+…but used `AsyncNotifier` as the base class instead of `AutoDisposeAsyncNotifier`. This caused a compile-time type mismatch.
+
+**Fix:** Changed the base class to `AutoDisposeAsyncNotifier<List<Map<String, dynamic>>>` and updated the `build()` return type accordingly. The Riverpod docs (not AI) confirmed the correct pattern.
+
+**Issue 2:** The AI placed the `autocomplete` route at `/tasks/search/autocomplete` but FastAPI matched `/tasks/{task_id}` first because `{task_id}` is a path parameter that also matches the string `"search"`. Requests to `/tasks/search/autocomplete` returned a 422 validation error trying to parse `"search"` as an integer.
+
+**Fix:** Moved the `/tasks/search/autocomplete` route **above** the `/tasks/{task_id}` route in the router file. FastAPI routes are matched in declaration order, so static paths must come before parameterised ones.
