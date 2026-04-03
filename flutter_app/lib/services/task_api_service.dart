@@ -13,7 +13,7 @@ class ApiException implements Exception {
 class TaskApiService {
   final Dio _dio;
 
-  TaskApiService({String baseUrl = 'http://localhost:8000/api/v1'})
+  TaskApiService({String baseUrl = 'https://flodo-task-app-1.onrender.com/api/v1'})
       : _dio = Dio(
           BaseOptions(
             baseUrl: baseUrl,
