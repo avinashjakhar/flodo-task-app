@@ -20,5 +20,6 @@ app.include_router(tasks.router, prefix="/api/v1", tags=["tasks"])
 
 
 @app.get("/health")
+@app.head("/health")
 def health_check():
     return {"status": "ok"}
